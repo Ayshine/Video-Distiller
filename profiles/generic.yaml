@@ -1,0 +1,10 @@
+# Default profile: no domain assumptions at all.
+# Used when --profile is omitted. An empty vocabulary means the ASR stage
+# adds no initial prompt, and the vocabulary eval is skipped.
+name: generic
+description: Any informational video, no domain specialization.
+vocabulary: []
+code_languages: []
+concept_id_prefix: gen
+verification: null
+distill_hints: ""

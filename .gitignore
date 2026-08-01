@@ -1,0 +1,43 @@
+# Byte-compiled / caches
+__pycache__/
+*.py[cod]
+.mypy_cache/
+.ruff_cache/
+.pytest_cache/
+
+# LLM response cache, pipeline job outputs, knowledge-base store
+.cache/
+jobs/
+.kb/
+
+# Rendered digests / notes from real (possibly copyrighted) source videos.
+# Keep generated study output out of the public repo.
+out/
+digests/
+c/
+cpp/
+
+# Personal / course-specific domain profiles. Only the generic example is
+# public; real profiles carry usage details and stay local.
+profiles/c.yaml
+profiles/cpp.yaml
+
+# Virtual environments
+.venv/
+venv/
+
+# Environment / secrets
+.env
+
+# Build artifacts
+build/
+dist/
+*.egg-info/
+
+# OS junk
+.DS_Store
+
+# Test fixtures are generated on demand and can be large
+tests/fixtures/*.mp4
+tests/fixtures/*.wav
+tests/fixtures/*.jpg
