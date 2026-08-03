@@ -27,9 +27,11 @@ def ingest_job_dirs(
     if not entries:
         return 0
 
-    # Embed concept + summary (the meaning), per the spec.
+    # Embed concept + summary (the meaning), per the spec. Batched: the
+    # embeddings API caps a request at ~300k tokens / 2048 inputs, so a large
+    # collection must be split across several calls.
     embed_texts = [f"{note.concept}\n{note.summary}" for note, _ in entries]
-    vectors = embedder.embed(embed_texts, model=embed_model)
+    vectors = _embed_batched(embedder, embed_texts, embed_model)
 
     store.ensure_collection(collection, len(vectors[0]))
     points = [
@@ -38,6 +40,30 @@ def ingest_job_dirs(
     ]
     store.upsert(collection, points)
     return len(points)
+
+
+def _embed_batched(
+    embedder: LLMClient,
+    texts: list[str],
+    model: str,
+    max_inputs: int = 1000,
+    max_tokens: int = 200_000,
+) -> list[list[float]]:
+    """Embed ``texts`` across several requests to stay under the API's per-call
+    limits (~300k tokens / 2048 inputs). Tokens are estimated as len/4."""
+    vectors: list[list[float]] = []
+    batch: list[str] = []
+    batch_tokens = 0
+    for text in texts:
+        est = max(1, len(text) // 4)
+        if batch and (len(batch) >= max_inputs or batch_tokens + est > max_tokens):
+            vectors.extend(embedder.embed(batch, model=model))
+            batch, batch_tokens = [], 0
+        batch.append(text)
+        batch_tokens += est
+    if batch:
+        vectors.extend(embedder.embed(batch, model=model))
+    return vectors
 
 
 def _build_point(

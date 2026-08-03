@@ -75,7 +75,13 @@ def run(video_meta: VideoMeta, job_dir: Path, profile: DomainProfile) -> Keyfram
     candidates: list[tuple[float, Path, imagehash.ImageHash]] = []
     for ts in timestamps:
         tmp = frames_dir / f"_cand_{ts:09.3f}.jpg"
-        _extract_frame(video_path, ts, tmp)
+        try:
+            _extract_frame(video_path, ts, tmp)
+        except VideoDistillError as exc:
+            # One un-extractable candidate (e.g. a scene cut within a frame of
+            # EOF) must not abort the whole stage — skip it and carry on.
+            logger.warning("detect_scenes: skipping frame at %.3fs: %s", ts, exc)
+            continue
         candidates.append((ts, tmp, _phash(tmp, profile.keyframe_mask_regions)))
 
     kept_indices = set(_dedup([ph for _, _, ph in candidates]))
@@ -189,6 +195,10 @@ def _extract_frame(video_path: Path, timestamp: float, out_path: Path) -> None:
         "1",
         "-q:v",
         "2",
+        # mjpeg expects full-range YUV; force it so limited-range (tv) sources
+        # don't crash the encoder ("Non full-range YUV is non-standard").
+        "-pix_fmt",
+        "yuvj420p",
         str(out_path),
     ]
     result = subprocess.run(cmd, capture_output=True, text=True)
