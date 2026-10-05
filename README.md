@@ -167,3 +167,17 @@ uv run mypy videodistill   # strict type check
 - **AWS-portable.** No global state; stages take explicit input/output paths and
   read config from the environment — a straight path to S3 + Step Functions +
   Fargate later.
+
+## License
+
+[PolyForm Noncommercial 1.0.0](LICENSE) — **free for any noncommercial purpose**:
+personal study, research, teaching, charity. Fork it, change it, share it.
+
+**Commercial use requires a paid license.** If you make money with it — selling a
+course or product built on it, running it as a service, or using it internally at
+a for-profit company — get in touch via <https://www.ayshine-ai.co.uk/>.
+
+Earlier versions were published under MIT, kept at
+[LICENSE-MIT-historical](LICENSE-MIT-historical) for the record. That grant stands
+for the versions it was published with; everything from this commit on is
+PolyForm Noncommercial.
